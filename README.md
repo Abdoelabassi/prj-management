@@ -24,3 +24,7 @@ to test run the following in your terminal
     npm i
 
 ```
+
+## Application
+graphql endpoint : *http://localhost/graphql*
+....
