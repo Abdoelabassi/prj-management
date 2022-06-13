@@ -1,8 +1,11 @@
 const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
 const schema = require("./schema/schema")
-require("dotenv").config();
+const colors = require("colors");
+const  connectdb  = require("./config/db");
 
+
+require("dotenv").config();
 
 
 
@@ -15,7 +18,8 @@ app.use('/graphql', graphqlHTTP({
 
 }))
 
-
+//connect to the database
+connectdb();
 
 
 
