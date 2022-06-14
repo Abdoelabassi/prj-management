@@ -1,6 +1,6 @@
 const { projects, clients } = require('../sampleData');
 
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLSchema, GraphQLList, GraphQLNonNull } = require('graphql');
+const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLSchema, GraphQLList, GraphQLNonNull, GraphQLEnumType } = require('graphql');
 //Client and Project db Schemas
 const Clients = require("../models/Clients");
 const Project = require("../models/Project");
@@ -74,6 +74,7 @@ const Rootquery = new GraphQLObjectType({
 const mutation = new GraphQLObjectType({
     name:"Mutation",
     fields:{
+        // add a client
         addClients:{
             type:Client,
             args:{
@@ -90,6 +91,45 @@ const mutation = new GraphQLObjectType({
                 });
 
                 return clients.save();
+            }
+        },
+        // delete a client
+        deleteClient:{
+            type:Client,
+            args:{
+                id:{ type: GraphQLNonNull(GraphQLID) },
+            },
+            resolve(parent, args){
+                return Clients.findByIdAndRemove(args.id)
+            }
+        },
+        // add a project
+        addProject:{
+            type:Project,
+            args:{
+                name :{ type: GraphQLNonNull(GraphQLString)  },
+                description:{ type: GraphQLNonNull(GraphQLString) },
+                status :{
+                    type: new GraphQLEnumType({
+                        name:"ProjectStatus",
+                        values:{
+                            'new': { value:"Not Started" },
+                            'progress': { value:"In progress" },
+                            'completed': { value:"Completed" }
+                        }
+                    }),
+                    defaultValue:"Not started"
+                },
+                cliendId:{ type: GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args){
+                const prj = new Project({
+                    name: args.name,
+                    description: args.description,
+                    status: args.status,
+                    cliendId: args.clientId
+                })
+                return prj.save()
             }
         }
     }
