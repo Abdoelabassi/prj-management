@@ -16,7 +16,7 @@ const ProjectType = new GraphQLObjectType({
         client:{
             type: Client,
             resolve(parent, args){
-                return clients.findById(parent.clientId)
+                return Clients.findById(parent.clientId)
             }
         }
     })
@@ -105,7 +105,7 @@ const mutation = new GraphQLObjectType({
         },
         // add a project
         addProject:{
-            type:Project,
+            type:ProjectType,
             args:{
                 name :{ type: GraphQLNonNull(GraphQLString)  },
                 description:{ type: GraphQLNonNull(GraphQLString) },
@@ -123,13 +123,53 @@ const mutation = new GraphQLObjectType({
                 cliendId:{ type: GraphQLNonNull(GraphQLID) }
             },
             resolve(parent, args){
-                const prj = new Project({
+                const project = new Project({
                     name: args.name,
                     description: args.description,
                     status: args.status,
                     cliendId: args.clientId
-                })
-                return prj.save()
+                });
+                return project.save()
+            }
+        },
+        // delete a project
+        deleteProject:{
+            type:ProjectType,
+            args:{
+                id:{ type: GraphQLNonNull(GraphQLID) },
+            },
+            resolve(parent, args){
+                return Project.findByIdAndRemove(args.id)
+            }
+        },
+        // update a project
+        updateProject:{
+            type:ProjectType,
+            args:{
+                id:{ type: GraphQLNonNull(GraphQLID) },
+                name:{ type: GraphQLString },
+                description:{ type: GraphQLString },
+                status :{
+                    type: new GraphQLEnumType({
+                        name:"ProjectStatusUpdate",
+                        values:{
+                            'new': { value:"Not Started" },
+                            'progress': { value:"In progress" },
+                            'completed': { value:"Completed" },
+                        },
+                    }),
+                }
+            },
+            resolve(parent, args){
+                return Project.findByIdAndUpdate(args.id, 
+                    {
+                        $set:{
+                        name:args.name,
+                        description:args.description,
+                        status:args.status
+                    }
+                    },
+                     {new:true})
             }
         }
     }
