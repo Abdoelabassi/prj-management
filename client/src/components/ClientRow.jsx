@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaTrash } from "react-icons/fa"
 import { useMutation } from "@apollo/client";
-import { deleteClients } from "../mutations/clientsMutations";
+import { deleteClients, addClients } from "../mutations/clientsMutations";
 import { getClients } from '../queries/clientsQueries';
 
 
@@ -9,10 +9,9 @@ import { getClients } from '../queries/clientsQueries';
 const ClientRow = ({ client }) => {
     const [deleteClient] = useMutation(deleteClients, {
         variables:{ id:client.id } ,
-        refetchQueries:[{ query: getClients },]
     } )
   return (
-    
+    <>
         <tr>
             <td>{client.name}</td>
             <td>{client.email}</td>
@@ -23,9 +22,11 @@ const ClientRow = ({ client }) => {
 
                 </button>
             </td>
+           
         </tr>
         
-    
+        
+    </>
   )
 }
 
